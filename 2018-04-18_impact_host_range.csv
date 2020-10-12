@@ -1,0 +1,193 @@
+species_name,Host,impact_host_range,taxonomic_host_range
+Phytophthora 'acacia',NA,NA,NA
+Phytophthora 'aquatilis',NA,NA,NA
+Phytophthora 'castitis',NA,NA,NA
+Phytophthora 'emanzi',NA,NA,NA
+Phytophthora 'kelmania',NA,NA,NA
+Phytophthora 'mekongensis',NA,NA,NA
+Phytophthora 'ohioensis',NA,NA,NA
+Phytophthora 'paludosa',NA,NA,NA
+Phytophthora 'parsley',NA,NA,NA
+Phytophthora 'personii',Nicotiana tabacum (Solanaceae).,1,species
+Phytophthora 'prodigiosa',NA,NA,NA
+Phytophthora 'raspberry',NA,NA,NA
+Phytophthora 'walnut',NA,NA,NA
+Phytophthora acerina,Acer pseudoplatanus,1,species
+Phytophthora agathidicida,Agathis australis and soil from mixed podocarp broad-leaf forest,1,species
+Phytophthora alticola,"Eucalyptus badjensis, Eucalyptus dunnii, Eucalyptus macarthurii (Myrtaceae).",1,family
+Phytophthora amaranthi,"Amaranthus tricolor (vegetable), Amaranthus viridis (weed)",1,genus
+Phytophthora amnicola,Isolated from still water: Western Australia,0,no plant hosts
+Phytophthora aquimorbida,Water,0,no plant hosts
+Phytophthora arenaria,"Banksia littoralis, B. attenuata, B. sphaerocarpa, B. hookeriana, B. menziesii, Hibbertia hypericoides, and Eucalyptus drummondii are hosts (Rea et al 2011)",3,> order
+Phytophthora asiatica,Pueraria lobata,1,species
+Phytophthora asparagi,"Agavaceae, Yucca  species, Furcraea species, Aloe (Cunnington et al 2005) Juniperus phoenicea, Pistacea lentiscus (Scanu et al. 2015)",2,order
+Phytophthora attenuata,"Castanopsis carlesii, Chamaecyparis formosensis (Jung et al 2016)",2,>order
+Phytophthora austrocedri,"Austrocedrus chilensis in Argentina,  Juniperus horizontalis in Germany, Juniperus communis and other ornamental Juniperus spp. in northern Britain Also isolated in Scotland from declining Chamaecyparis lawsoniana (Green and MackAskill, unpublished) and Callitropsis nootkatensis (Green et al, 2016) (UK lineage in both cases) . DNA records on Cuppressocyparis leylandii (UK Plant Health data) (lineage not defined). ",1,family
+Phytophthora balyanboodja,"rhizosphere 
+soil 
+of mixed native vegetation",0,no plant hosts
+Phytophthora bilorbang,"Rubus anglocandicans  (Aghighi et al 2012)  Juniperus phoenicea, Pistacea lentiscus (Scanu et al. 2015) ",1,species
+Phytophthora bishii,"Several genera of Rosaceae. (Strawberry, raspberry, Rose)  (Abad et al 2008).  Rosaceae & Rhododendron sp. (Ericaceae) (Q-bank)",2,> order
+Phytophthora boehmeriae,"Citrus spp. (Rutaceae), Capsicum annuum (Chowdappa et al 2014)  Boehmeria nivea (Urticaceae); Gossypium sp. (Malvaceae) cotton; soil beneath dead Persoonia longifolia (Q-bank)",4,> order
+Phytophthora boodjera,"Eucalyptus spp.,  Agonis flexuosa, Corymbia calophylla (Myrtaceae), Banksia media, Banksia grandis, , Xanthorrhoea preissii",3,> order
+Phytophthora borealis,Streams (Hansen et al 2012),0,no plant hosts
+Phytophthora botryosa,"Hevea spp. (Euphorbiaceae). Theobroma cacao and other cultivated spp. can be infected on inoculation                              Cocos nucifera, Hevea brasiliensis, Vanilla (Q-bank)",4,> order
+Phytophthora brassicae,Brassica oleracea and Brassica sinensis (Brassicaceae).,1,genus
+Phytophthora cactorum,"At least 154 genera of vascular plants in 54 families                                                                          Cactus sp. (Cactacea); Lilium candidum (Liliaceae); Panax ginseng (Araliaceae); Prunus armeniaca (Rosaceae); Prunus laurocerasus ""Rotundifolia"" (Rosaceae); Rhododendron (Ericaceae); Syringa vulgaris (Oleaceae) (Q-bank)                                         Common hosts are Strawberry and Apple (DC database)",54,> order
+Phytophthora cajani,Cajanus cajani (Fabaceae).,1,species
+Phytophthora cambivora,"30 genera in 19 families, including Castanea (chestnut, Fagaceae).     Andromeda floribunda (Ericaceae); Castanea sativa (Fagaceae); Chamaecyparis sp. (Cupressaceae) (Q-bank)",19,> order
+Phytophthora capensis,Associated with Agathosma spp. and has not been evaluated for pathogenicity towards this host. Isolated from  Curtisia dentata (Curtisiaceae); Olea capensis (Oleaceae) (Bezuidenhout et al 2010).,3,> order
+Phytophthora capsici,"Capsicum annuum (peppers), Lycopersicon esculentum (tomatoes), and other Solanaceae. Aragaki & Uchida 2001 refer isolates from non-Capsicum hosts to P. tropicalis, including isolates from Macadamia spp., Theobroma cacao (cacao), and other tropical crop species.  Capsicum annuum (Solanaceae); Capsicum frutescens (Solanaceae); Citrullus lanatus (Cucurbitaceae); Cucumis melo (Cucurbitaceae); Cucurbita sp. (Cucurbitaceae); Lycopersicon esculentum (Solanaceae) (Qbank)",4,> order
+Phytophthora captiosa,Eucalyptus botryoides and E. saligna. Closely associated with the foliage of Eucalyptus Dick et al 2006),1,genus
+Phytophthora caryae,To date isolated only from natural waterways,0,no plant hosts
+Phytophthora castaneae,"Castanea crenata, Castanopsis fargesii",1,family
+Phytophthora castanetorum,NA,NA,NA
+Phytophthora chlamydospora,Multiple trees and horticultural hosts,6,> order
+Phytophthora chrysanthemi,Chysanthemum (Asteraceae).,1,genus
+Phytophthora cichorii,Cichorium intybus (Compositae) (Q-bank),1,species
+Phytophthora cinnamomi,"266 genera in 90 families, commonly hardwood trees. Cinchona ledgeriana, Persea americana, persea gratissima, Camellia japonica, Pinus echinata, Ananas comosus, citrus, Chamaecyparis lawsoniana, Cineraria, Rhododendron, Cinnamomum.  Ananas comosus (Bromeliaceae); Camellia japonica (Theaceae); Chamaecyparis lawsoniana var. alumii (Cupressaceae); Cinchona ledgeriana (Rubiaceae); Cineraria sp. (Compositae); Cinnamomum burmannii (Lauraceae); Citrus sp. (Rutaceae); Persea americana (Lauraceae); Persea gratissima (Lauraceae); Pinus echinata (Pinaceae); Rhododendron sp. (Ericaceae) (Q bank), Beaucarnea sp. (Agavaceae), Robinia pseudoacacia",90,> order
+Phytophthora citricola,75 genera in 38 families.,38,> order
+Phytophthora citrophthora,88 genera in 51 families. Ornamanets (DC database). Citrus sinensis (Rutaceae); Citrus sp. (Rutaceae); Malus pumila var. dulcissima (Rosaceae); Skimmia sp. (Rutaceae); Malus pumila var dulcissima; skimmia; citrus sinensis (Q-bank),51,> order
+Phytophthora clandestina,"Trifolium subterraneum (subterranean clover, Fabaceae); Medicago spp. are also susceptible",1,family
+Phytophthora cocois,"Cocos nucifera (Arecaceae); possibly Theobroma cacao (Malvaceae).
+",2,> order
+Phytophthora colocasiae,Colocasia esculenta (taro) and other Aracaceae; also six genera in five other families.,6,> order
+Phytophthora condilina,Casuarina obesa,1,species
+Phytophthora constricta,"Banksias spp., Hakea spp., Adenanthos spp. and Isopogon spp., also Pinus radiata",2,> order
+Phytophthora cooljarloo,NA,NA,NA
+Phytophthora crassamura,"Picea abies, Juniperus rhizosphere soil In previous studies, P. crassamura was referred to as P. megasperma [20,21,27,28].
+Seven accessions of P. megasperma isolates at NCBI GenBank matched the sequence data of
+P. crassamura, however they are not linked to any formal publication. Note I could not check this on this old browser",2,order
+Phytophthora cryptogea,at least 141 genera in 49 families ,49,> order
+Phytophthora dauci, Daucus carota (Umbelliferae) ,1,species
+Phytophthora drechsleri,113 genera in 40 families (phytophthora database). Beta vulgaris var. altissima (Amaranthaceae); Beta vulgaris var. altissima (Chenopodiaceae); Solanum tuberosum (Solanaceae) (Q-bank),40,> order
+Phytophthora elongata,"Eucalyptus marginata, Corymbia calophylla, Banksia grandis, Leucopogon propinquus, Dryandra squarrosa, Xanthorrhoea preissii, X. gracilis and Patersonia xanthina.",4,> order
+Phytophthora erythroseptica,"113 genera in 40 families (Phytophthora database). Atropa belladonna, Brassica oleracea, Carduus arvensis, Caleolaria, Cymbidium, Cynosurus, Hordeum vulgare, Legmus chinensis, Lolium multiflorum, Lycopersicon esculentum, Phleum pratense, Plantago media, Saccharum officinarum, Secale cerale, Senecio cruentus, Solanum tuberosum, Spinacia oleracea, Trifolium, Triticum vulgare, Tulipa, Tussilago farfara, Vicia, Zantedeschia (Erwin & Ribeiro, 1996). ",40,> order
+Phytophthora estuarina,NA,NA,NA
+Phytophthora europaea,Quercus spp (Fagaceae) can also be found below Carpinus betulus and Fraxinus excelsior growing in these mixed forests (Hansen & Delatour 1999).,1,family
+Phytophthora fallax,"Eucalyptus delegatensis, E. fastigata, E. nitens and E. regnans",1,Genus
+Phytophthora flexuosa,Fagus hayatae,1,species
+Phytophthora fluvialis,not known to cause disease,0,no plant hosts
+Phytophthora foliorum,Rhododendron spp. (Ericaceae).,1,genus
+Phytophthora formosa,Araucaria cunninghamii in the sub-tropical Castanopsis–Machilus forest in Lenhuachih and with Quercus glandulifera in the arboretum in Fushan ,2,> order
+Phytophthora fragariae,"Fragaria x ananassa and Rubus ursinus var. longanobaccus (Rosaceae) are the only known hosts under natural conditions. Infection of other Rosaceae, Chenopodiaceae, and Solanaceae can occur via artificial inoculation",1,family
+Phytophthora fragariaefolia,recovered from diseased strawberry crowns in Japan. In pathogenicity tests it can also cause a low level of disease on rose (Rosaceae),1,family
+Phytophthora frigida,"Acacia decurrens (Fabaceae), Eucalyptus smithii (Myrtaceae) (Phytophthtora database). Acacia mearnsii (Leguminosae); Eucalyptus smithii (Myrtaceae) (Q-bank)",3,> order
+Phytophthora gallica,"from soil beneath a declining mature Quercus robur and from the littoral zone of a lake with Phragmites australis and Salix alba as dominants, in pathogenicity tests P. gallica was only weakly aggressive to Q. robur and S. alba, and non-pathogenic to Phragmites australis (Phytophthora database).",2,> order
+Phytophthora gemini,Zostera marina (seagrass) ,1,species
+Phytophthora gibbosa,"Acacia pycnantha, Xanthorrhoea gracilis, A. pycnantha, Grevillea sp. (Jung et al 2011)",3,> order
+Phytophthora glovera,Nicotiana tabacum (Solanaceae).,1,species
+Phytophthora gonapodyides,"Thirteen genera in 11 families, including Malus spp. (Rosaceae); possibly also on Pinaceae seedlings including Pseudotsuga menziesii (Douglas-fir), Abies spp., and Tsuga mertensiana (mountain hemlock).",11,> order
+Phytophthora gondwanensis,NA,NA,NA
+Phytophthora gregata,"Pathogenic on Patersonia sp., Xanthorrhoea preissii, Hakea sp.and Pinus radiata.",4,> order
+Phytophthora hedraiandra,"Viburnum sp. (Adoxaceae), Rhododendron sp. (Ericaceae).",2,> order
+Phytophthora heveae,12 genera in 11 families including Hevea (rubber Euphorbiaceae) Rhododendron (Ericaceae) and Cocos nucifera (coconut Arecaceae) (Phytophthora database).,11,> order
+Phytophthora hibernalis,"Primarily Citrus spp. (Rutaceae); on 11 genera in 9 families (Phytophthora database). Kalmia in Scotland, Chamaecyparis in England (DC database)",9,> order
+Phytophthora himalsilva,"Quercus, Castanopsis, Carpinus and Cupressus spp. In pathogenicity trials it was capable of causing lesions on twigs of Juglans regia. ",2,> order
+Phytophthora humicola,"Natural host unknown, but isolated from a Citrus sp. orchard (Rutaceae). Inoculated hosts include Malus domestica (apple, Rosaceae) and Cucumis sativus (cucumber, Cucurbitaceae).",3,> order
+Phytophthora hydrogena,Thus far it has not been associated with diseased plant material.,0,no plant hosts
+Phytophthora hydropathica,"leaf and stem necrosis on Rhododendron catawbiense and collar rot of Kalmia latifolia. It also causes seedling damping-off of cucumber (Cucumis sativus cv. Orient Express) and root rots of azaleas (Rhododendron Kurume hybrid cv. Hershey’s Red). It also infected the roots of dusty miller (Senecio bicolor subsp. cineraria cv. Silver Dust), tomato (Solanum lycopersicum cv. Homestead) and pepper (Capsicum annuum) plants. In addition, it can enter through wounds and cause fruit rot of peppers and tomatoes.",4,> order
+Phytophthora idaei,"Rubus idaeus (red raspberry, Rosaceae). Raspberry",1,species
+Phytophthora ilicis,Ilex spp. (Aquifoliaceae).,1,genus
+Phytophthora infestans,"Late blight of potato and tomato. Overwinters in tubers. Several races occur. Also causes leaf blights and, rarely, damping off, flower, and fruit blight in a wide range of hosts (Phytophthtora database). Severe pathogen of potato (Solanum tuberosum) and tomato (Lycopersicon esculentum) and can lead to 100% crop loss under conditions favorable for disease development and in the absence of fungicide",1,genus
+Phytophthora insolita,"Rhododendron sp. (Ericaceae). Able to infect Malus domestica (apple, Rosaceae) and Cucumis sativus (cucumber, Cucurbitaceae) fruits when inoculated",3,> order
+Phytophthora intercalaris,NA,NA,NA
+Phytophthora intricata,Quercus tarokoensis,1,species
+Phytophthora inundata,"Plants in multiple families, including Aesculus hippocastanum (chestnut, Sapindaceae), Salix (willow, Salicaceae), Olea (olive, Oleaceae) and Vitis (grapevine, Vitaceae).",4,> order
+Phytophthora ipomoeae,Ipomoea longipedunculata,1,species
+Phytophthora iranica,"Solanum melongena (eggplant); Solanum tuberosum (potato), Lycopersicon esculentum (tomato), all Solanaceae, and Beta vulgaris (sugar beet, Chenopodiaceae) are infected when inoculated. Reports on Myrtus (Myrtaceae) are Phytophthora italica.",2,> order
+Phytophthora irrigata,"pathogenic to azaleas and some vegetables such as tomato, pepper, and eggplant.",2,> order
+Phytophthora kernoviae,"Fagus sylvatica. It has also been isolated from similar lesions on Quercus robur and Liriodendron tulipifera. Rhododendron ponticum, Magnolia spp., Pieris formosa, Gevuina avellana, Camellia spp. and Michelia doltsopa, and leaf and shoot dieback of Q. ilex. ",5,> order
+Phytophthora kwongonina,NA,NA,NA
+Phytophthora lactucae, Lactuca sativa (Compositae) (Q-bank),1,species
+Phytophthora lacustris,"Alnus glutinosa, Fraxinus excelsior, Prunus spp. and Salix matsudana. in laboratory pathogenicity assays it proved to be moderately aggressive to stems/ twigs of Betula pendula, Carpinus betulus, Fagus sylvatica, Quercus petraea and Salix alba. ",4,> order
+Phytophthora lateralis,"Chamaecyparis lawsoniana (Lawson cypress aka Port Orford cedar, Cupressaceae), Chamaecyparis obtusa, Chamaecyparis pisifera, Thuja occidentalis, Thuja plicata, rarely Taxus brevifolia (Pacific yew, Taxaceae). DNA finding on Juniperus sabina in UK. Published reports on hosts other than Cupressaceae and Taxaceae thought to be mis-identifcations (See Green & Webber; Pest Risk Analysis for Phytophthora lateralis).",2,order
+Phytophthora lilii,NA,NA,NA
+Phytophthora litchii,NA,NA,NA
+Phytophthora litoralis,"Pathogenic on Xanthorrhoea preissii, Banksia sp. and Casuarina obesa.",3,> order
+Phytophthora macilentosa,NA,NA,> order
+Phytophthora macrochlamydospora,"Glycine max (soybean, Fabaceae",1,species
+Phytophthora meadii,"Various plant families including Hevea spp. (rubber, Euphorbiaceae).",3,> order
+Phytophthora medicaginis,"Medicago sativa (alfalfa), Onobrychis viciifolia (sainfoin), Cicer arietinum (chickpea) (Fabaceae). Also reported on Prunus mahaleb (cherry, Rosaceae).",2,species
+Phytophthora megakarya,"Theobroma cacao (cacao, Sterculiaceae). Also reported from Irvingia sp. (Irvingiaceae).",2,> order
+Phytophthora megasperma,Multiple hosts in 22 families (Plantwise),22,> order
+Phytophthora melonis,"Cucumis sativus (cucumber, Cucurbitaceae). Also reported from Citrullus lanatus (Cucurbitaceae) and Pistacia vera (Anacardiaceae).",2,> order
+Phytophthora mengei,Persea americana (Lauraceae).,1,species
+Phytophthora mexicana,Solanum lycopersicum (Solanaceae),1,species
+Phytophthora mirabilis,Mirabilis jalapa (Nyctaginaceae).,1,species
+Phytophthora mississippiae,Irrigation water,0,species
+Phytophthora morindae,Morinda citrifolia var. citrifolia (Rubiaceae).,1,species
+Phytophthora moyootj,NA,NA,NA
+Phytophthora multivesiculata,Cymbidium sp. (Orchidaceae).,1,species
+Phytophthora multivora,"Associated with several taxa. Pathogenic toward Eucalyptus gomphocephala, E. marginata, Agonis flexuosa. Implicated in decline of Eucalyptus gomphocephala. Numerous other hosts including Banksia attenuata, B. grandis, B. littoralis, B. menziesii, B. prionotes, Bossiaea sp., Conospermum sp., Gastrolobium spinosum, Leucopogon verticillatus, Xanthorrhoea gracilis, Patersonia sp., Podocarpus drouyniana, Quercus petraea and Pinus radiata.",7,> order
+Phytophthora nagaii,Rose stems in Japan. In pathogenicity tests it can also cause a low level of disease on strawberry,1,genus
+Phytophthora nemorosa,"necrotic lesions of Umbellularia californica, Arctostaphylos spp., and Sequoia sempervirens. It has also been recovered from bark cankers of Lithocarpus densiflorus and Quercus agrifolia.",4,family
+Phytophthora nicotianae,Wide host range: 255 genera in 90 families,90,> order
+Phytophthora niederhauserii,Multiple hosts: 33 hosts from 25 families,25,> order
+Phytophthora obscura,"nursery plants and soil underneath diseased Aesculus hippocastanum.  leaf tissue of Kalmia latifolia, substrate underneath Pieris and from soil samples underneath Aesculus hippocastanum exhibiting disease symptoms.Pathogenicity tests have confirmed K. latifolia, A. hippocastanum, Rhododendron catawbiense and Pieris japonica as hosts",2,> order
+Phytophthora occultans,Buxus sempervirens,1,species
+Phytophthora ornamentata,Pistacia lentiscus,1,species
+Phytophthora pachypleura,"Mainly on Aucuba japonica. Also detected on Buxus sempervirens, Meconopsis
+grandis, Robinia pseudoacacia ‘Frisia’, Rubus idaeus,
+Salvia officinalis, Tagetes erecta, Taxus baccata and Vaccinium
+myrtillus, and taxa that (on the basis of the data
+provided by the RHS Advisory Service) could only be
+identified to the level of the following genera: Begonia,
+Bougainvillea, Ceanothus, Chaenomeles, Cornus, Crocus,
+Eryngium, Ilex, Lathyrus, Osmanthus, Prunus, Pyrus,
+Rhododendron, Rosa and Viburnum.",18,> order
+Phytophthora palmivora,Over 138 species from various plant families.  22 families (Plantwise CABI data sheet) ,22,> order
+Phytophthora parsiana,"Ficus carica (Iran), Pistacia vera crowns, branches and surrounding soil (Iran and USA), and Prunus dulcis (Greece) (phytophthora database). Medicago sativa (Leguminosae) (Q bank).",4,> order
+Phytophthora parvispora,"Arbutus unedo, Mandevilla sp., Pinus pinea (rhizosphere soil), Beaucarnea sp., Agathosma betulina",5,> order
+Phytophthora phaseoli,"Phaseolus lunatus (also reported as P. limensis) (lima beans, Fabaceae). Capable of infecting plants from other families after inoculation (Erwin & Ribeiro 1996). Also reported from Phaseolus vulgaris (common bean).",1,family
+Phytophthora pini,"Pine, beech (Jung et al. 2009), ornamentals and vegetables  (Hong et al. 2008) (phytophthora database) ",3,> order
+Phytophthora pinifolia,Pinus radiata ,1,species
+Phytophthora pisi,NA,NA,NA
+Phytophthora pistaciae,"Pistacia vera (pistachio, Anacardiaceae).",1,species
+Phytophthora plurivora,"Abies alba, Alnus glutinosa, Alnus incana, Acer platanoides, Acer pseudoplatanus, Acer saccharum, Aesculus hippocastanum, Carpinus betulus, Fagus sylvatica, Fraxinus excelsior, Quercus robur, Quercus petraea, Quercus rubra, Rhododendron spp., Syringa vulgaris, Tilia spp., Tsuga canadensis (phytophthtora database) Acer saccharum (Sapindaceae); Corynocarpus laevigatus (Corynocarpaceae); Fagus sylvatica (Fagaceae); Rhododendron hybrid (Ericaceae); soil with Alnus glutinosa root (Q bank)",8,> order
+Phytophthora pluvialis,"P. pluvialis was recovered from baited streams, soil and canopy drip in the mixed tanoak (Notholithocarpus densiflorus)-Douglas-fir (Pseudotsuga menziesii) forest in Curry County, Oregon, USA. We have found it in two additional streams in western Oregon (Clear Creek, lower west slope of north Oregon Cascades and Yachats River, lower west slope of central Oregon Coast Range). It has been found only rarely associated with twig and stem cankers on tanoak. We have not found P. pluvialis associated with any other plant host.",1,species
+Phytophthora polonica,Recovered from soil around declining alder trees but in laboratory tests was slightly pathogenic to alder twigs and not pathogenic to trunks of several tree species (phytophthora database). Alnus glutinosa (Betulaceae) (Q bank).,1,species
+Phytophthora porri,Principal host: Allium spp. (Liliaceae); also 5 other genera in 5 families. Not on Brassicaceae; this is a distinct species Phytophthora brassicae (Phytophthora datbase). Leeks (DC database).,6,> order
+Phytophthora primulae,Primula spp. (Primulaceae) (phytophthora database).,1,genus
+Phytophthora pseudocryptogea,NA,NA,NA
+Phytophthora pseudolactucae,NA,NA,NA
+Phytophthora pseudopolonica,NA,NA,NA
+Phytophthora pseudorosacearum,NA,NA,NA
+Phytophthora pseudosyringae,"Quercus spp., Fagus sylvatica, Alnus glutinosa and other hardwood species (Phytophthtora database) Larix (Anna Harris). Pieris, Magnolia (DC database). Nothofagusis in Britain (Scanu et al 2012), Castanea sativa in Sardinia (Scanu et al 2010) Fagus sylvatica in Central italy (Motta et al 2003). Umbellularia californica in the USA. Vaccinium myrtillus (Beales et al 2009)",7,> order
+Phytophthora pseudotsugae,"Pseudotsuga menziesii (Douglas-fir, Pinaceae).",1,species
+Phytophthora psychrophila,Infects Ilex aquifolium and Quercus spp. in inoculation tests.,2,> order
+Phytophthora quercetorum,Quercus spp. (Fagaceae).,1,genus
+Phytophthora quercina,Quercus spp. (Fagaceae) (Phytophthtora database). Medicago sativa (Leguminosae) (Q bank).,1,family
+Phytophthora quininea,Cinchona spp. (Rubiaceae).,1,genus
+Phytophthora ramorum,"At least 26 genera in 17 families, including Rhododendron spp. (Ericaceae) and Quercus spp. (Fagaceae).",17,> order
+Phytophthora rhizophorae,NA,NA,NA
+Phytophthora richardiae,"Zantedeschia spp. (Araceae). Also Robinia (Fabaceae), Asparagus (Asparagaceae), Daucus carota (carrot, Apiaceae), and Lycopersicon esculentum (tomato, Solanaceae) (Erwin & Ribeiro 1996).",5,> order
+Phytophthora riparia,Water,0,no plant hosts
+Phytophthora rosacearum,"fruit trees, including apple, cherry, apricot, peach (). Rosaceous tree host (DC database). Pistacia vera (Anacardiaceae); Prunus armeniaca (Rosaceae) (Q-bank)",2,> order
+Phytophthora rubi,Rubus idaeus var. idaeus (Rosaceae).,1,species
+Phytophthora sansomeana,"Soybean, Douglas fir (Phytophthora database), Glycine max (Leguminosae); Trifolium procumbens (Leguminosae) (Q-bank)",2,> order
+Phytophthora siskiyouensis,"Lithocarpus densiflorus (Fagaceae), Umbellularia californica (Lauraceae). Alnus cordata, Alnus incana",3,> order
+Phytophthora sojae,"Glycine max (soybeans), Lupinus spp. (lupine) (Fabaceae); also reported from six other genera in five families (Phytophthora database).",6,> order
+Phytophthora stricta,NA,NA,NA
+Phytophthora syringae,"29 genera in 14 families, including Syringa vulgaris (lilac, Oleaceae) and Rosaceae (phytophthora database) Malus sp. (Rosaceae); Malus sylvestris (Rosaceae); Prunus armeniaca (Rosaceae); Prunus dulcis (Rosaceae); Prunus sp. (Rosaceae); Rhododendron sp. (Ericaceae); Syringa sp. (Oleaceae) stem (Q-bank).",14,> order
+Phytophthora tentaculata,"Chrysanthemum spp., Verbena, Santolina (Asteraceae) (Phytophthora database). Bacopa sp. (Plantaginaceae); Chrysanthemum frutescens (Compositae); Chrysanthemum leucanthemum (Compositae); Verbena sp. (Verbenaceae), Argyranthemum frutescens, Bacopa, Leucanthemum vulgare,Verbena (Q-bank).",4,> order
+Phytophthora terminalis,Pachysandra terminalis,1,species
+Phytophthora thermophila,"Recovered from water, rhizosphere soil associated with dying plants (Eucalyptus marginata, Banksia grandis).",2,> order
+Phytophthora trifolii,Trifolium spp. (Fabaceae). Trifolium sp. (Leguminosae),1,genus
+Phytophthora tropicalis,14 genera in 12 families (phytophthora database),12,> order
+Phytophthora tubulina,NA,NA,NA
+Phytophthora tyrrhenica,NA,NA,NA
+Phytophthora uliginosa,"Quercus robur, Quercus petraea (Fagaceae) (Jung et al 2002).  ",1,genus
+Phytophthora uniformis,"Alnus spp. (alder, Betulaceae).",1,genus
+Phytophthora versiformis,NA,NA,NA
+Phytophthora vignae,"Vigna unguiculata (= Vigna sinensis, Fabaceae), Vigna angularis (=Phaseolus angularis, Fabaceae, sometimes referred to Phytophthora vignae f.sp. adzukicola). Malus domestica (apple, Rosaceae) fruits can be infected when inoculated. Reports from a few other taxa (Phytophthora database).",2,> order
+Phytophthora virginiana,Irrigation water. ornamental nursery reservoirs,0,no plant hosts
+Phytophthora vulcanica,NA,NA,NA
+Phytophthora x alni,"Alnus spp. (alder, Betulaceae).",1,genus
+Phytophthora x andina,Solanaceae,1,family
+Phytophthora x heterohybrida,no known hosts,0,no plant hosts
+Phytophthora x incrassata,no known hosts,0,no plant hosts
+Phytophthora x multiformis,"Alnus spp. (alder, Betulaceae",1,genus
+Phytophthora x pelgrandis,Pelargonium grandiflorum,1,species
+Phytophthora x serendipita,"Idesia polycarpa, Penstemon, Rhododendron",3,> order
+Phytophthora x stagnum,NA,NA,NA

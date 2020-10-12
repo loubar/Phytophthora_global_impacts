@@ -1,0 +1,920 @@
+---
+title: "Figures and tables"
+author: "Louise Barwell"
+date: "5th December 2018"
+output: html_document
+
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,  message = FALSE, warning = FALSE)
+```
+
+```{r echo=FALSE, warning=FALSE}
+rm(list=ls())
+
+library(knitr)
+#library(pandoc)
+library(coda)
+library(reshape2)
+library(ggplot2)
+library(scales)
+library(abind)
+library(boral)
+library(ggpubr)
+library(htmlTable)
+library(kableExtra)
+library(ggrepel)
+library(dplyr)
+library(ggnewscale)
+#library(tidyverse)
+
+
+# load results of all fitted models
+# excluding disease symptom traits
+load("geographic_extent_model_comparison_disease.rData")
+responseA <- geographic_extent_model_comparison_disease
+impact_metricA <- "impact_geographic_extent"
+  
+load("host_range_model_comparison_disease.rData")
+responseC <- host_range_model_comparison_disease
+impact_metricC <- "impact_host_range"
+
+load("lat_max_model_comparison_disease.rData")
+responseB <- lat_max_model_comparison_disease
+impact_metricB <- "impact_lat_max"
+
+  # parameter names returned by brms models,
+# in the order the predictors should be displayed
+parname_labels <- 
+  c("b_years_known" = "time since described",
+    "b_root_disease" = "root disease symptoms",
+    "b_foliar_disease" = "foliar disease symptoms",
+    "b_foliar_disease.root_disease" = "root disease x foliar disease",
+    "b_caduceus" =  "caducous sporangia",
+    "b_proliferation" = "proliferating sporangia",
+    "b_hyphal_swelling" ="hyphal swellings",
+    "b_chlamydospores" = "chlamydospores",
+    "b_oospores" = "oospores",
+    "b_oospore_wall_index" = "oospore wall index",
+    "b_gr_at_opt" = "growth rate at optimum temperature",
+    "b_temp_min" = "minimum temp for growth",
+    "b_temp_max" = "maximum temp for growth",
+    "b_temp_opt" = "optimum temperature for growth"
+  )
+
+
+```
+Response variables:
+<br>
+```{r}
+for (i in 1:length(grep("model_comparison", list.files(), value = TRUE))){
+  print(paste(strsplit(grep("model_comparison", list.files(), value = TRUE)[i],
+           split = "_")[[1]][1:2], collapse = " "))
+}
+```
+<br>
+<br>
+<br>
+
+```{r  figure 1 functions, echo=FALSE}
+###############################################################################################################
+# Fig.1: Top subset of models of impact based on traits
+###############################################################################################################
+
+# function to extract the top subset of models
+get_top_model_subset <- function(model_set,           # one of the outputs from the file 4_collate_model_results.R e.g. responseB_no_year
+                                 rank_by,             # IC metric for ranking models, one of "kfold10IC" or "LOOIC"
+                                 IC_threshold        # number of IC units to select top model subset 
+                                 ){       
+  
+
+  rank_all_models <-
+    model_set[order(model_set[,rank_by,"est"]),,]
+  rank_all_models <- abind(rank_all_models,
+                           array(rank_all_models[,rank_by,"est"] - rank_all_models[1,rank_by,"est"],
+                                 replace(dim(rank_all_models), 2, 1)),
+                           along = 2)
+  dimnames(rank_all_models)[[2]][grep("^$", dimnames(rank_all_models)[[2]])] <- "diff_IC"
+  rank_all_models <- abind(rank_all_models,
+                           array(1:nrow(rank_all_models),
+                                 replace(dim(rank_all_models), 2, 1)),
+                           along = 2)
+  dimnames(rank_all_models)[[2]][grep("^$", dimnames(rank_all_models)[[2]])] <- "model_rank"
+  rank_all_models <- rank_all_models[,names(which(!apply(apply(rank_all_models, 2, is.na), 2, all))),]
+#  rank_all_models <- rank_all_models[rank_all_models[,"diff_IC","est"] <= IC_threshold,,]
+  return(array(data = rank_all_models[rank_all_models[,"diff_IC","est"] <= IC_threshold,,], 
+               dim = replace(dim(rank_all_models), 1, length(which(rank_all_models[,"diff_IC","est"] <= IC_threshold))), 
+               dimnames = dimnames(rank_all_models)))
+}
+
+
+# function to extract the parameter estimates and convert to format for ggplot2::geom_tile
+get_parest <- function(top_subset){  # output from function get_top_model_subset
+                          
+  top_models <- as.data.frame(array(data = top_subset[,,"est"], 
+                                    dim = dim(top_subset)[1:2], 
+                                    dimnames = dimnames(top_subset)[1:2]))
+  #top_models <- top_models[,names(which(!apply(apply(top_models, 2, is.na), 2, all)))]
+  # create white space at the bottom to populate with text of R2 values rather than a heat map
+  top_models$b_Intercept <- NULL
+  top_models$rank <- 1:nrow(top_models)
+  top_models$R2_fixed_c <- 0
+  top_models$R2_traits_c <- 0
+  top_models$diff_IC <- 0
+  top_models$ICCadj <- 0
+  top_models$R2_traits_m <- 0
+  top_models$R2_fixed_m <- 0
+  top_models$ICC <- 0
+  melt_top_models <- melt(top_models[,grep("b_|^rank$|R2_fixed|R2_traits|diff_IC|ICCadj|ICC", colnames(top_models), value = TRUE)], id.vars = c("rank"))
+  #melt_top_models$impact_metric <- metric
+  #melt_top_models$impact_metric <- factor(melt_top_models$impact_metric, levels = c("impact response: host range", "impact response: geographic extent"))
+  return(melt_top_models)
+}
+
+# function to score paramter estimates as sig/non-sig based on credible interavls and convert to format for ggplot2::geom_tile 
+get_sig <- function(top_subset){ # output from function get_top_model_subset 
+  top_models <- data.frame(array(data = ((top_subset[,,"lower"] > 0 & top_subset[,,"upper"] > 0)| 
+                                  (top_subset[,,"lower"] < 0 & top_subset[,,"upper"] < 0)), 
+                                 dim = dim(top_subset)[1:2], 
+                                 dimnames = dimnames(top_subset)[1:2]),                                                                                                                                                 
+                           rank = 1:nrow(top_subset))
+  top_models <- top_models[
+    ,grep("b_|^rank$",colnames(top_models), value = TRUE)]
+  top_models$b_Intercept <- NULL
+  melt_top_models <- melt(top_models, id.vars = c("rank"))
+  melt_top_models$value <- ifelse(melt_top_models$value,
+                                  yes = "*",
+                                  no = " ")
+  #melt_top_models$impact_metric <- metric
+  return(melt_top_models)
+}
+
+# function to plot parameter estimates and sigificance in top model subset
+# both impact metrics are plotted together
+plot_model_comparison <- function(model_sets, # e.g model_comparison_no_disease, _model_comparison_disease
+                                  rank_by,
+                                  IC_threshold){
+  
+  parest_sig <- get_sig(top_subset = get_top_model_subset(model_set = model_sets, 
+                                                                rank_by = rank_by, 
+                                                                IC_threshold = IC_threshold))
+                      
+  
+  parest <- 
+    get_parest(top_subset = get_top_model_subset(model_set = model_sets, 
+                                                   rank_by = rank_by, 
+                                                   IC_threshold = IC_threshold))
+  
+      
+  
+  # collate model performance metrics to add to the figure:
+  # rank
+  # delta IC
+  # conditional and marginal R squared
+  # lambda  
+  # intra-class correlation (proportion of variance in impact explained by phylogentic covariance)
+  model_performance <-
+    data.frame(array(data = get_top_model_subset(model_set = model_sets, 
+                                                       rank_by = rank_by, 
+                                                       IC_threshold = IC_threshold)[,c("model_rank", 
+                                                                                       "diff_IC", 
+                                                                                       "R2_fixed_m",
+                                                                                       "R2_traits_m",
+                                                                                       "R2_fixed_c",
+                                                                                       "R2_traits_c",
+                                                                                       "ICCadj",
+                                                                                       "ICC"),"est"], 
+                     dim = replace(dim(get_top_model_subset(model_set = model_sets, 
+                                                                  rank_by = rank_by, 
+                                                                  IC_threshold = IC_threshold))[1:2], 2, length(c("model_rank", 
+                                                                                                                  "diff_IC", 
+                                                                                                                  "R2_fixed_m",
+                                                                                                                  "R2_traits_m",
+                                                                                                                  "R2_fixed_c",
+                                                                                                                  "R2_traits_c",
+                                                                                                                  "ICCadj",
+                                                                                                                  "ICC"))), 
+                     dimnames = list(NULL, c("model_rank", 
+                                             "diff_IC", 
+                                             "R2_fixed_m",
+                                             "R2_traits_m",
+                                             "R2_fixed_c",
+                                             "R2_traits_c",
+                                             "ICCadj",
+                                             "ICC"
+))))
+  
+  
+  # order the predictors and model performance metrics as they will displayed in the figure
+  # order by the number of times the predictor appears in the top subset
+  b_pars <- parest[grep("^b_", parest$variable),c("variable", "value")]
+  b_pars$variable <- as.vector(b_pars$variable)
+  times_in_top_subset <- function(x){sum(!is.na(x))}
+  parest$variable <- factor(parest$variable,
+                            levels = c(
+                              "diff_IC",
+                              "ICC",
+                              "ICCadj",
+                              "R2_traits_m",
+                              "R2_fixed_m",
+                              "R2_traits_c", 
+                              "R2_fixed_c",
+                              names(sort(tapply(b_pars$value, b_pars$variable, times_in_top_subset)))                            ))
+  parest$rank <- factor(parest$rank, levels = as.character(1:max(parest$rank)))
+  
+  gg <- ggplot(parest) 
+  gg <- gg + geom_tile(aes(rank, variable, fill = value)) 
+  gg <- gg + scale_fill_gradient2(low = "blue",
+                                  high = "red",
+                                  mid = "white",
+                                  name = "Parameter\nestimate",
+                                  midpoint = 0
+  )
+  
+  # gg <- gg + facet_grid(~impact_metric,
+  #                       drop = TRUE,
+  #                       scales = "free",
+  #                       space = "free"
+  # )
+  make.bold <- function(x) as.expression(lapply(x, function(y) bquote(bold(.(y)))))
+  gg <- gg + scale_y_discrete(labels=c(make.bold(parname_labels[names(parname_labels) %in% parest$variable]),
+                                       "R2_fixed_c" = expression(bold(conditional~R^2~(years~known~+~traits~+~phylogeny))),
+                                       "R2_fixed_m" = expression(bold(marginal~R^2~(years~known~+~traits))),
+                                       "R2_traits_c" = expression(bold(conditional~R^2~(traits~+~phylogeny))),
+                                       "R2_traits_m" = expression(bold(marginal~R^2~(traits~only))),
+                                       "ICCadj" = expression(bold(adjusted~phylogenetic~intra-class~correlation)),
+                                       "ICC" = expression(bold(phylogenetic~intra-class~correlation)),
+                                       "diff_IC" = expression(bold(Delta~IC~(10-fold~cross-validation)))),
+                                       
+                                        
+  # "R2_conditional" = expression(conditional~R^2),
+  # "R2_traits" = expression(marginal~R^2),
+  # "diff_IC" = expression(Delta~IC~(10-fold~cross-validation)),
+  # "lambda" = expression(phylogenetic~signal~(lambda))),  
+                              
+                              expand = c(0, 0)) + ylab("") + xlab("")
+  #br <- aggregate(rank~disease+impact_metric, data = parest, FUN = max)$rank
+  gg <- gg + scale_x_discrete(expand = c(0,0))
+  gg <- gg + theme(#axis.text.x=element_text(angle=90, vjust = 0.5, hjust = #1),
+    #text = element_text(size = 5),               
+    axis.text = element_text(colour = "black", size = 12, face = "bold"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    legend.title = element_text(size = 12),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = "white"),
+    panel.border = element_rect(colour = "grey", fill = NA),
+    plot.margin=unit(c(0,0,0,0), "cm"))
+  gg <- gg + geom_text(data = model_performance,
+                       aes(x = model_rank,
+                           y = 1, 
+                           label  = sprintf("%.2f", round(diff_IC, 2)),
+                           angle = 0),
+                       size = 4,
+                       show.legend = FALSE)
+   gg <- gg + geom_text(data = model_performance,
+                        aes(x = model_rank,
+                            y = 2, 
+                            angle = 0,
+                            label  = sprintf("%.2f", round(ICC, 2))),
+                        show.legend = FALSE,
+                        size = 4)
+  gg <- gg + geom_text(data = model_performance,
+                       aes(x = model_rank,
+                           y = 3, 
+                           angle = 0,
+                           label  = sprintf("%.2f", round(ICCadj, 2))),
+                       show.legend = FALSE,
+                       size = 4)
+  gg <- gg + geom_text(data = model_performance,
+                       aes(x = model_rank,
+                           y = 4, 
+                           angle = 0,
+                           label  = sprintf("%.2f", round(R2_traits_m, 2))),
+                       show.legend = FALSE,
+                       size = 4)
+  gg <- gg + geom_text(data = model_performance,
+                       aes(x = model_rank,
+                           y = 5, 
+                           angle = 0,
+                           label  = sprintf("%.2f", round(R2_fixed_m, 2))),
+                       show.legend = FALSE,
+                       size = 4)
+  gg <- gg + geom_text(data = model_performance,
+                       aes(x = model_rank,
+                           y = 6, 
+                           angle = 0,
+                           label  = sprintf("%.2f", round(R2_traits_c, 2))),
+                       show.legend = FALSE,
+                       size = 4)
+  gg <- gg + geom_text(data = model_performance,
+                       aes(x = model_rank,
+                           y = 7, 
+                           angle = 0,
+                           label  = sprintf("%.2f", round(R2_fixed_c, 2))),
+                       show.legend = FALSE,
+                       size = 4)
+  
+  gg<- gg + geom_text(data = parest_sig,
+                      aes(x = rank,
+                          y = variable,
+                          label = value))
+  
+  gg
+  
+}
+
+
+
+```
+
+view the best-performing models
+```{r countries_best_perf}
+get_top_model_subset(model_set = responseA,
+                     rank_by = "kfold10IC",
+                     IC_threshold = 2 )[,,"est"]
+```
+
+```{r lat_best_perf}
+
+get_top_model_subset(model_set = responseB,
+                     rank_by = "kfold10IC",
+                     IC_threshold = 2 )[,,"est"]
+```
+
+```{r host_best_perf}
+
+get_top_model_subset(model_set = responseC,
+                     rank_by = "kfold10IC",
+                     IC_threshold = 2 )[,,"est"]
+```
+
+```{r fig 1, warning=FALSE, fig.height=18, fig.width=15}
+
+responseC_traits <- 
+plot_model_comparison(model_sets = responseC,
+                      rank_by = "kfold10IC",
+                      IC_threshold = 2)
+#host_range_traits
+# ggsave(host_range_traits,
+#        filename = paste0(save_directory, "Fig1A_host_range_traits_subset.tiff"),
+#        height = 11,
+#        width = 11,
+#        units = "in",
+#        dpi = 700)
+
+responseB_traits <- 
+plot_model_comparison(model_sets = responseB,
+                      rank_by = "kfold10IC",
+                      IC_threshold = 2)
+#host_range_traits
+# ggsave(host_range_traits,
+#        filename = paste0(save_directory, "Fig1A_host_range_traits_subset.tiff"),
+#        height = 11,
+#        width = 11,
+#        units = "in",
+#        dpi = 700)
+
+responseA_traits <- 
+plot_model_comparison(model_sets = responseA,
+                      rank_by = "kfold10IC",
+                      IC_threshold = 2)
+#geo_extent_traits
+# ggsave(geo_extent_traits,
+#        filename = paste0(save_directory, "Fig1B_geo_ext_traits_subset.tiff"),
+#        height = 11,
+#        width = 11,
+#        units = "in",
+#        dpi = 700)
+
+
+
+stack_plots <- ggarrange(responseA_traits, responseB_traits, responseC_traits, nrow = 3, labels = c("(a)", "(b)", "(c)"), align = "v")
+
+annotate_figure(p = stack_plots,
+                fig.lab = "                 model rank",
+                fig.lab.pos = "bottom",
+                fig.lab.size = 16,
+                fig.lab.face = "bold")
+ ggsave(filename = paste0(save_directory, "Fig1_top_model_subset_traits.tiff"),
+        height = 18,
+        width = 15,
+        units = "in",
+        dpi = 800)
+```
+<br>
+<br>
+**Fig. 1 Best performing trait-based models models of *Phytophthora*  (a) `r paste(strsplit(grep("model_comparison", list.files(), value = TRUE)[1],split = "_")[[1]][1:2], collapse = " ")` and (b) `r paste(strsplit(grep("model_comparison", list.files(), value = TRUE)[2],split = "_")[[1]][1:2], collapse = " ")` impact metrics.  260 candidate trait-based models were ranked using a 10-fold cross-validation information criterion. The subset of best models were selected based on difference in information criterion < 2 IC units from the best model. Asterisks indicate where the 95% credible intervals for a parameter estimate do not overlap zero and indicate evidence for a significant effect of the trait in that model.  Fixed effects are ordered from top to bottom by the number of times they were present in the top model subset.  Grey shading indicates predictors were absent from the model.  Red and blue colours indicate positive and negative parameter estimates, respectively.  Deeper colours indicate stronger effect sizes.  Within-sample goodness-of-fit (R^2^) was quantified by partitioning variance into fixed effects (years known + traits, traits only) and phylogenetically structured error (phylogenetic intra-class correlation).**
+<br> 
+<br> 
+<br> 
+
+Explore which species are predicted to have greater impacts than we have observed, to date, based on their trait values and phylogenetic position and years known to science.  
+```{r rank species by residuals}
+traits_original <- read.csv("2018-01-29_Phytophthora_trait_database_merged.csv", stringsAsFactors = FALSE)
+rownames(traits_original) <- traits_original$species_name
+load("scaled_by.rData")
+
+# species historically part of complexes (following Abad IDphy)
+complex <- c("Phytophthora x alni",         #alni
+             "Phytophthora x multiformis",  #alni
+             "Phytophthora uniformis",      #alni
+             "Phytophthora alticola",       # new clade
+             "Phytophthora boodjera",       # new clade
+             "Phytophthora arenaria",       # new clade
+             "Phytophthora capensis",       # citricola
+             "Phytophthora medicaginis",    # megasperma
+             "Phytophthora multivora",      # citricola
+             "Phytophthora plurivora",      # citricola
+             "Phytophthora pseudocryptogea",# cryptogea
+             "Phytophthora rosacearum",     # megasperma
+             "Phytophthora sansomeana",     # megasperma
+             "Phytophthora trifolii",       # megasperma
+             "Phytophthora sojae",          # megasperma
+             "Phytophthora pini",           # citricola
+             "Phytophthora acerina",        # citricola
+             "Phytophthora pachypleura",    # citricola
+             "Phytophthora elongata")       # citricola
+
+#full_model <- 2560
+#best_model <- get_top_model_subset(model_set = responseA, rank_by = "kfold10IC", IC_threshold = 2)[1,"model_index","est"]
+
+get_ob_pred <- function(impact_metric, model_set, model_index, type_res){
+  # load the model to use for prediction
+  load(paste0(impact_metric, "_disease_", model_index, ".rData")) # full model or best model?
+  # get the fitted values, including the phylogenetic covariance, but excluding the effect of years known to science
+  # we want to see which species we'd expect to see high impacts for
+ return(data.frame(fitted(model_fit, 
+                          re_formula = ~(1|species_name),
+                          # newdata = data.frame(years_known = (model_fit$data$years_known*scaled_by["years_known"]+20)/scaled_by["years_known"], # 20 years from now
+                          #                       model_fit$data[,grep("years_known",
+                          #                                           colnames(model_fit$data),
+                          #                                            invert = TRUE)]),
+                          robust = TRUE, scale = "response"
+                          )[,c(1,3,4)], 
+                   observed = model_fit$data[,impact_metric],
+            metric = impact_metric,
+            species_name = model_fit$data$species_name, # paste0("italic('", model_fit$data$species_name, "')"),
+            year = traits_original[model_fit$data$species_name, "date"],
+            clade = traits_original[model_fit$data$species_name, "phylo_clade"],
+            res = residuals(model_fit,
+                            re_formula = NULL, 
+                            method = "fitted", 
+                            robust = TRUE, 
+                            type = type_res)[,"Estimate"],
+            complex = ifelse(model_fit$data$species_name %in% complex, yes = "*", no = "")
+        ))
+
+  
+}
+# use the best-performing model for prediction
+ob_pred_geo  <- get_ob_pred(impact_metric = impact_metricA, model_set = responseA, model_index = get_top_model_subset(model_set = responseA, rank_by = "kfold10IC", IC_threshold = 2)[1,"model_index","est"], type_res = "pearson") 
+ob_pred_host <- get_ob_pred(impact_metric = impact_metricC, model_set = responseC, model_index = get_top_model_subset(model_set = responseC, rank_by = "kfold10IC", IC_threshold = 2)[1,"model_index","est"], type_res = "pearson")
+ob_pred_lat <- get_ob_pred(impact_metric = impact_metricB, model_set = responseB, model_index = get_top_model_subset(model_set = responseB, rank_by = "kfold10IC", IC_threshold = 2)[1,"model_index","est"], type_res = "pearson")
+
+
+
+```
+Which species are predicted to have higher than observed impacts? If they are only recently described, these may have the potential for greater global spread and broader host ranges than other Phytophthoras. We use the model residuals to rank them and pick out the most over- and under-predicted species.
+```{r examine observed and expected countries, fig.height=10}
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+ob_pred_lower_geo <- ob_pred_geo[order(ob_pred_geo$res, decreasing = TRUE),]
+ob_pred_higher_geo <- ob_pred_geo[order(ob_pred_geo$res),]
+
+kable(ob_pred_higher_geo[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l") #%>%
+  #kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+```{r over-observed geo}
+kable(ob_pred_lower_geo[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+```
+
+```{r examine observed and expected lat}
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+ob_pred_lower_lat <- ob_pred_lat[order(ob_pred_lat$res, decreasing = TRUE),]
+ob_pred_higher_lat <- ob_pred_lat[order(ob_pred_lat$res),]
+
+kable(ob_pred_higher_lat[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+
+```
+
+```{r over-observed lat}
+kable(ob_pred_lower_lat[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+```
+
+```{r examine observed and expected hosts}
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+ob_pred_lower_host <- ob_pred_host[order(ob_pred_host$res, decreasing = TRUE),]
+ob_pred_higher_host <- ob_pred_host[order(ob_pred_host$res),]
+
+kable(ob_pred_higher_host[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+
+```
+
+```{r over-observed host}
+
+kable(ob_pred_lower_host[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+```
+
+```{r plot observed and expected values, fig.height=9, fig.width=9}
+
+top_residuals <- 8
+
+ob_pred_geo$pos_neg_res <- ifelse(ob_pred_geo$res < 0, yes = "-", no = "+")
+ob_pred_host$pos_neg_res <- ifelse(ob_pred_host$res < 0, yes = "-", no = "+")
+ob_pred_lat$pos_neg_res <- ifelse(ob_pred_lat$res < 0, yes = "-", no = "+")
+ob_pred_geo$recent <- ifelse(ob_pred_geo$year >= 2010, yes = "2010 onwards", no = "before 2010")
+ob_pred_host$recent <- ifelse(ob_pred_host$year >= 2010, yes = "2010 onwards", no = "before 2010")
+ob_pred_lat$recent <- ifelse(ob_pred_lat$year >= 2010, yes = "2010 onwards", no = "before 2010")
+
+ob_pred_geo$pos_neg_raw <- factor(ifelse((ob_pred_geo$observed - ob_pred_geo$Estimate) < 0, yes = "-", no = "+"), levels = c("+", "-"))
+ob_pred_host$pos_neg_raw <- factor(ifelse((ob_pred_host$observed - ob_pred_host$Estimate) < 0, yes = "-", no = "+"), levels = c("+", "-"))
+ob_pred_lat$pos_neg_raw <- factor(ifelse((ob_pred_lat$observed - ob_pred_lat$Estimate) < 0, yes = "-", no = "+"), levels = c("+", "-"))
+
+
+geo_pred <- ggplot() + geom_point(data = ob_pred_geo, aes(x = Estimate, y = observed, col = pos_neg_res, shape = recent), size = 3) + 
+  scale_fill_discrete("residuals") + scale_color_discrete("residuals") +
+  scale_shape_manual("year described", values = c(16, 21)) +
+  geom_abline(intercept = 0, slope = 1, linetype = 3) +
+  scale_x_continuous(trans = "log10", breaks = c(1, 5, 10, 50, 100), limits = c(1,100)) + scale_y_continuous(trans = "log10", breaks = c(1,5,  10, 50, 100), limits = c(1,100)) +
+  coord_equal() + 
+  geom_text_repel(data = ob_pred_lower_geo[1:top_residuals,], aes(x = Estimate, y = observed, label = paste0("italic('", species_name, "')")), col = "darkgrey", size = 3, nudge_x = -5, nudge_y = 1, min.segment.length = 0, parse = TRUE, force = 10, direction = "y") +
+  new_scale_color() +
+  geom_text_repel(data = ob_pred_higher_geo[1:top_residuals,], aes(x = Estimate, y = observed, label = paste0("italic('", species_name, "')"), col = ifelse(year >= 2010, yes = "y", no = "n")), size = 3, nudge_x = +5, nudge_y = -0.2, min.segment.length = 0,parse = TRUE, force = 10, direction = "y", show.legend = FALSE) + 
+  scale_color_manual(values = c("n" = "darkgrey", "y" = "black")) +
+  geom_text(data = ob_pred_geo, aes(x = Estimate, y = observed, label = complex), size = 5) +
+  theme(panel.grid = element_blank()) + xlab("Predicted") + ylab("Observed") 
+
+lat_pred <- ggplot() + geom_point(data = ob_pred_lat, aes(x = Estimate, y = observed, col = pos_neg_res, shape = recent), size = 3) + 
+  scale_fill_discrete("residuals") + scale_color_discrete("residuals") +
+  scale_shape_manual("year described", values = c(16, 21)) +
+  geom_abline(slope = 1, linetype = 3) +
+  scale_x_continuous(limits = c(10, 80)) + scale_y_continuous(limits = c(10, 80)) +
+  coord_equal() + 
+  geom_text_repel(data = ob_pred_lower_lat[1:top_residuals,], aes(x =  Estimate, y = observed, label = paste0("italic('", species_name, "')")), col = "darkgrey", size = 3, nudge_x = -50, nudge_y = 0, min.segment.length = 0, parse = TRUE, force = 10, direction = "y") + 
+  new_scale_color() +
+  geom_text_repel(data = ob_pred_higher_lat[1:top_residuals,], aes(x = Estimate, y = observed, label = paste0("italic('", species_name, "')"),col = ifelse(year >= 2010, yes = "y", no = "n")), size = 3, nudge_x = +30, nudge_y = - 20, min.segment.length = 0,parse = TRUE, force = 10, direction = "y", show.legend = FALSE) + 
+    scale_color_manual(values = c("n" = "darkgrey", "y" = "black")) +
+  geom_text(data = ob_pred_lat, aes(x = Estimate, y = observed, label = complex), size = 5) +
+  theme(panel.grid = element_blank()) + xlab("Predicted") + ylab("Observed") 
+
+
+host_pred <- ggplot() + geom_point(data = ob_pred_host, aes(x = 1 + Estimate, y = 1 + observed, col = pos_neg_res, shape = recent), size = 3) + 
+  scale_fill_discrete("residuals") + scale_color_discrete("residuals") +
+  scale_shape_manual("year described", values = c(16, 21)) +
+  geom_abline(slope = 1, linetype = 3) +
+  scale_x_continuous(trans = "log2", breaks = c(1,5,  10, 50, 100), limits = c(1,100)) + scale_y_continuous(trans = "log2", breaks = c(1,5,  10, 50, 100), limits = c(1,100)) +
+  coord_equal() + 
+  geom_text_repel(data = ob_pred_lower_host[1:top_residuals,], aes(x = 1 + Estimate, y = 1 + observed, label = paste0("italic('", species_name, "')")), col = "darkgrey", size = 3, nudge_x = -5, nudge_y = +2, min.segment.length = 0, parse = TRUE, force = 10, direction = "y") + 
+  new_scale_color() +
+  geom_text_repel(data = ob_pred_higher_host[1:top_residuals,], aes(x = 1 + Estimate, y = 1 + observed, label = paste0("italic('", species_name, "')"),col = ifelse(year >= 2010, yes = "y", no = "n")), size = 3, nudge_x = +5, nudge_y = - 0.2, min.segment.length = 0,parse = TRUE, force = 10, direction = "y", show.legend = FALSE) +
+  scale_color_manual(values = c("n" = "darkgrey", "y" = "black")) +
+  geom_text(data = ob_pred_host, aes(x = 1 + Estimate, y = 1 + observed, label = complex), size = 5) +
+  theme(panel.grid = element_blank()) + xlab("1 + Predicted") + ylab("1 + Observed") 
+
+
+ggarrange(geo_pred, lat_pred, host_pred, nrow = 2, ncol = 2, labels = c("(a)", "(b)", "(c)"), common.legend = TRUE, legend = "bottom")
+ggsave("observed_predicted.tiff", height = 9, width = 9, units = "in", dpi = 600)
+
+
+```
+
+
+
+
+
+Now plot the observed and predicted using the full model
+
+Explore which species are predicted to have greater impacts than we have observed, to date, based on their trait values and phylogenetic position and years known to science.  
+```{r rank species by residuals full}
+
+
+ob_pred_geo  <- get_ob_pred(impact_metric = impact_metricA, model_set = responseA, model_index = 2560, type_res = "pearson")
+ob_pred_host <- get_ob_pred(impact_metric = impact_metricC, model_set = responseC, model_index = 2560, type_res = "pearson")
+ob_pred_lat <- get_ob_pred(impact_metric = impact_metricB, model_set = responseB, model_index = 2560, type_res = "pearson")
+
+```
+Which species are predicted to have higher than observed impacts? If they are only recently described, these may have the potential for greater global spread and broader host ranges than other Phytophthoras. We use the model residuals to rank them and pick out the most over- and under-predicted species.
+
+#countries reached:
+```{r examine observed and expected countries full, fig.height=10}
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+ob_pred_lower_geo <- ob_pred_geo[order(ob_pred_geo$res, decreasing = TRUE),]
+ob_pred_higher_geo <- ob_pred_geo[order(ob_pred_geo$res),]
+
+kable(ob_pred_higher_geo[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l") #%>%
+  #kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+```{r over-observed_full_model_geo}
+kable(ob_pred_lower_geo[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+```
+
+#Latitudinal limits
+
+```{r full examine observed and expected lat}
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+ob_pred_lower_lat <- ob_pred_lat[order(ob_pred_lat$res, decreasing = TRUE),]
+ob_pred_higher_lat <- ob_pred_lat[order(ob_pred_lat$res),]
+
+kable(ob_pred_higher_lat[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+
+```
+
+```{r over-observed_full_model_lat}
+kable(ob_pred_lower_lat[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+```
+
+#Number of host plant families
+```{r examine observed and expected hosts full}
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+
+# which species are predicted to have higher than observed impacts? - use residuals to rank them
+ob_pred_lower_host <- ob_pred_host[order(ob_pred_host$res, decreasing = TRUE),]
+ob_pred_higher_host <- ob_pred_host[order(ob_pred_host$res),]
+
+kable(ob_pred_higher_host[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+
+```
+
+```{r over-observed_full_model_host}
+
+kable(ob_pred_lower_host[1:20,] %>% 
+        mutate(Estimate = paste0(sprintf("%.2f", Estimate), " [", 
+                                 sprintf("%.2f", Q2.5), ", ", 
+                                 sprintf("%.2f", Q97.5), "]"),
+               species_name = paste0("*",species_name, "*", " ", complex)) %>% select(c(6:8,4, 1,9)), 
+      row.names = FALSE, 
+      digits = 2,
+      col.names = c( "Species name",
+                     "Year described",
+                     "Phylogenetic clade",
+                      "Observed",
+                     "Estimate [lower, upper 95% credible intervals]",
+                    "Pearson's residual error"),
+      format = "html",
+      padding = 2, align = "l")
+
+```
+
+```{r plot observed and expected values full model, fig.height=12, fig.width=6}
+top_residuals <- 8
+
+ob_pred_geo$pos_neg_res <- ifelse(ob_pred_geo$res < 0, yes = "-", no = "+")
+ob_pred_host$pos_neg_res <- ifelse(ob_pred_host$res < 0, yes = "-", no = "+")
+ob_pred_lat$pos_neg_res <- ifelse(ob_pred_lat$res < 0, yes = "-", no = "+")
+
+ob_pred_geo$pos_neg_raw <- factor(ifelse((ob_pred_geo$observed - ob_pred_geo$Estimate) < 0, yes = "-", no = "+"), levels = c("+", "-"))
+ob_pred_host$pos_neg_raw <- factor(ifelse((ob_pred_host$observed - ob_pred_host$Estimate) < 0, yes = "-", no = "+"), levels = c("+", "-"))
+ob_pred_lat$pos_neg_raw <- factor(ifelse((ob_pred_lat$observed - ob_pred_lat$Estimate) < 0, yes = "-", no = "+"), levels = c("+", "-"))
+
+
+geo_pred <- ggplot() + geom_point(data = ob_pred_geo, aes(x = Estimate, y = observed, col = pos_neg_res, fill = pos_neg_res)) + 
+  geom_abline(intercept = 0, slope = 1, linetype = 3) +
+  scale_x_continuous(trans = "log10", breaks = c(1, 5, 10, 50, 100), limits = c(1,100)) + scale_y_continuous(trans = "log10", breaks = c(1,5,  10, 50, 100), limits = c(1,100)) +
+  coord_equal() + 
+  geom_text_repel(data = ob_pred_lower_geo[1:top_residuals,], aes(x = Estimate, y = observed, label = paste0("italic('", species_name, "')")), size = 3, nudge_x = -5, nudge_y = + 0.2, min.segment.length = 0, parse = TRUE, force = 10, direction = "y") + 
+  geom_text_repel(data = ob_pred_higher_geo[1:top_residuals,], aes(x = Estimate, y = observed, label = paste0("italic('", species_name, "')")), size = 3, nudge_x = +5, nudge_y = - 0.2, min.segment.length = 0,parse = TRUE, force = 10, direction = "y") + 
+  geom_text(data = ob_pred_geo, aes(x = Estimate, y = observed, label = complex), size = 3) +
+  theme(panel.grid = element_blank()) + xlab("Predicted") + ylab("Observed") +
+  scale_fill_discrete("residuals") + scale_color_discrete("residuals")
+
+lat_pred <- ggplot() + geom_point(data = ob_pred_lat, aes(x = Estimate, y = observed, col = pos_neg_res, fill = pos_neg_res)) + 
+  geom_abline(slope = 1, linetype = 3) +
+  scale_x_continuous(limits = c(10, 80)) + scale_y_continuous(limits = c(10, 80)) +
+  coord_equal() + 
+  geom_text_repel(data = ob_pred_lower_lat[1:top_residuals,], aes(x =  Estimate, y = observed, label = paste0("italic('", species_name, "')")), size = 3, nudge_x = -50, nudge_y = 0, min.segment.length = 0, parse = TRUE, force = 10) + 
+  geom_text_repel(data = ob_pred_higher_lat[1:top_residuals,], aes(x = Estimate, y = observed, label = paste0("italic('", species_name, "')")), size = 3, nudge_x = +30, nudge_y = - 20, min.segment.length = 0,parse = TRUE, force = 10, direction = "y") + 
+  geom_text(data = ob_pred_lat, aes(x = Estimate, y = observed, label = complex), size = 3) +
+  theme(panel.grid = element_blank()) + xlab("Predicted") + ylab("Observed") +
+  scale_fill_discrete("residuals") + scale_color_discrete("residuals")
+
+
+host_pred <- ggplot() + geom_point(data = ob_pred_host, aes(x = 1 + Estimate, y = 1 + observed, col = pos_neg_res, fill = pos_neg_res)) + 
+  geom_abline(slope = 1, linetype = 3) +
+  scale_x_continuous(trans = "log10", breaks = c(1,5,  10, 50, 100), limits = c(1,100)) + scale_y_continuous(trans = "log10", breaks = c(1,5,  10, 50, 100), limits = c(1,100)) +
+  coord_equal() + 
+  geom_text_repel(data = ob_pred_lower_host[1:top_residuals,], aes(x = 1+ Estimate, y = 1 + observed, label = paste0("italic('", species_name, "')")), size = 3, nudge_x = -5, nudge_y = + 0.2, min.segment.length = 0, parse = TRUE, force = 10) + 
+  geom_text_repel(data = ob_pred_higher_host[1:top_residuals,], aes(x = 1+Estimate, y = 1 + observed, label = paste0("italic('", species_name, "')")), size = 3, nudge_x = +5, nudge_y = - 0.1, min.segment.length = 0,parse = TRUE, force = 10, direction = "y") + 
+  geom_text(data = ob_pred_host, aes(x = 1+ Estimate, y = 1 + observed, label = complex), size = 3) +
+  theme(panel.grid = element_blank()) + xlab("1 + Predicted") + ylab("1 + Observed") +
+  scale_fill_discrete("residuals") + scale_color_discrete("residuals")
+
+
+ggarrange(geo_pred, lat_pred, host_pred, nrow = 3, labels = c("(a)", "(b)", "(c)"), align = "v", common.legend = TRUE, legend = "bottom")
+ggsave("observed_predicted_full.tiff", height = 18, width = 7, units = "in", dpi = 600)
+
+
+```
+
+
+### Check for multi-collinearity among traits
+
+```{r VIFs, fig.width=16}
+library(car)
+load("impact_geographic_extent_disease_2560.rData")
+
+geo_model_lm <- lm(impact_geographic_extent ~ years_known + caduceus + chlamydospores + foliar_disease + gr_at_opt + hyphal_swelling + oospore_wall_index + oospores + proliferation + root_disease + temp_min + temp_opt + foliar_disease:root_disease,
+                 data = model_fit$data)
+# glm 
+
+geo_vif <- vif(geo_model_lm)
+
+load("impact_lat_max_disease_2560.rData")
+
+lat_model_lm <- lm(impact_lat_max ~ years_known + caduceus + chlamydospores + foliar_disease + gr_at_opt + hyphal_swelling + oospore_wall_index + oospores + proliferation + root_disease + temp_min + temp_opt + foliar_disease:root_disease,
+                 data = model_fit$data)
+# glm 
+
+lat_vif <- vif(lat_model_lm)
+
+load("impact_host_range_disease_2560.rData")
+
+host_model_lm <- lm(impact_host_range ~ years_known + caduceus + chlamydospores + foliar_disease + gr_at_opt + hyphal_swelling + oospore_wall_index + oospores + proliferation + root_disease + temp_min + temp_opt + foliar_disease:root_disease,
+                 data = model_fit$data)
+# glm 
+
+host_vif <- vif(host_model_lm)
+
+all_vifs <- cbind(geo_vif, lat_vif, host_vif)
+all_vifs <- all_vifs[order(all_vifs[,1], decreasing = TRUE),]
+
+all_vifs <- as_data_frame(round(all_vifs, 2)) %>% mutate(Trait = c("Foliar disease", "Foliar disease x root disease", "optimum temperature for growth", "root disease", "minimum temperature for growth", "proliferating sporangia", "Caducous sporangia", "Growth rate at optimum temperature", "Oospore presence", "Years since described", "Oospore wall index", "Hyphal swellings", "Chlamydospores"))
+
+
+
+
+kable(all_vifs[,c(4,1:3)], row.names = FALSE, col.names = c("Trait","Number of countries reached", "Latitudinal limits", "Number of known host families")) 
+
+
+```
+
+
